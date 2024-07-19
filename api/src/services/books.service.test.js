@@ -3,21 +3,29 @@ const BooksService = require('./books.service')
 const fakeBooks = [
   {
     _id: 1,
-    name: 'Harry Potter fake 1'
+    name: 'Harry Potter fake 1',
   },
   {
     _id: 2,
-    name: 'Harry Potter fake 2'
+    name: 'Harry Potter fake 2',
   },
 ]
 
+const mockGetAll = jest.fn()
+
 const MongoLibSub = {
-  getAll: () => [...fakeBooks],
+  // getAll: () => [...fakeBooks],
+  getAll: mockGetAll,
   create: () => {},
 }
 
 // Cuando se llame esta libreria, quiero hacer remplazarla
-jest.mock('../lib/mongo.lib.js', () => jest.fn().mockImplementation(() => MongoLibSub))
+jest.mock('../lib/mongo.lib.js', () =>
+  jest.fn().mockImplementation(() => ({
+    getAll: mockGetAll,
+    create: () => {},
+  }))
+)
 
 describe('Test for BooksService', () => {
   let service
@@ -29,15 +37,25 @@ describe('Test for BooksService', () => {
   describe('test for getBooks', () => {
     test('should retunr list of books', async () => {
       // Arrange
+      mockGetAll.mockResolvedValue(fakeBooks)
       // Act
-      const books = await service.getBooks()
+      const books = await service.getBooks({})
       console.log('👽 ~ test ~ books:', books)
       // Assert
       expect(books.length).toEqual(2)
+      expect(mockGetAll).toHaveBeenCalled()
+      expect(mockGetAll).toHaveBeenCalledTimes(1)
+      expect(mockGetAll).toHaveBeenCalledWith('books', {})
     })
 
     test('should retunr name of the first book', async () => {
       // Arrange
+      mockGetAll.mockResolvedValue([
+        {
+          _id: 3,
+          name: 'Harry Potter fake 1',
+        },
+      ])
       // Act
       const books = await service.getBooks()
       console.log('👽 ~ test ~ books:', books)
