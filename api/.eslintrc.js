@@ -1,3 +1,5 @@
+const { SemicolonPreference } = require("typescript");
+
 module.exports = {
   env: {
     browser: true,
@@ -6,12 +8,12 @@ module.exports = {
     node: true,
     jest: true,
   },
-  extends: [
-    'airbnb-base',
-  ],
+  extends: ['airbnb-base'],
   parserOptions: {
     ecmaVersion: 'latest',
   },
   rules: {
+    SemicolonPreference: false,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
-};
+}
